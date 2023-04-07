@@ -79,13 +79,18 @@ class Area_code:
         output ->(str): 返回数据格式类型,可选值：JSON，XML
     """
 
-    def __init__(self):
+    def __init__(self, keywords=''):
         self.url = 'https://restapi.amap.com/v3/config/district?'
         self.key = '157b68bc8bc8f2345294b4dfb97c5afc'
-        self.keywords = ''
+        self.keywords = keywords
         self.subdistrict = '3'
         self.page = '1'
         self.output = 'JSON'
+        self.check()
+
+    def check(self):
+        if self.keywords == '':
+            raise Exception('Error: keywords is None')
 
     def get_code(self):
         get_url = f'{self.url}key={self.key}&keywords={self.keywords}&subdistrict={self.subdistrict}' \

@@ -3,12 +3,11 @@ import pprint
 
 
 def demo():
-    codes = Area_code()
-    # 查找地区
-    codes.keywords = '南浔'
+    codes = Area_code('湖州')
     # 取得地区区划编码
-    code = codes.get_code()[0][0]
-    weathers = Weather('2020-09', 3, code)
+    code = codes.get_code()[0]
+    print(f'天气位置: {code[1]}')
+    weathers = Weather('2020-09', 3, code[0])
     dic = weathers.get_history_weather()
     key = dic.keys()
     res = dict()
