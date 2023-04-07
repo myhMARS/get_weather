@@ -81,6 +81,7 @@ class Area_code:
 
     def __init__(self, keywords=''):
         self.url = 'https://restapi.amap.com/v3/config/district?'
+        # key的每日配额为5000条
         self.key = '157b68bc8bc8f2345294b4dfb97c5afc'
         self.keywords = keywords
         self.subdistrict = '3'

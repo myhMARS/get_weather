@@ -37,4 +37,5 @@
 > 
 
 > *Area_code* 类  
-> 参见 [*高德api*](https://lbs.amap.com/api/webservice/guide/api/district)
+> 参见 [*高德api*](https://lbs.amap.com/api/webservice/guide/api/district)  
+> api key限额为每日5000条
