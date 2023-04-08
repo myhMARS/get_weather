@@ -1,8 +1,15 @@
 import json
 import re
+import difflib
+import logging
 
 import jsonpath
 import requests
+
+from adcode_dic import Adcode
+
+logging.basicConfig(level=logging.INFO)
+logging.disable()
 
 
 class Weather:
@@ -11,20 +18,22 @@ class Weather:
         url -> (str): api接口
         st_date -> (str): 开始日期(精确至月）格式为 YYYY-MM
         count -> int: 持续月数
+        weathers -> dict: 获取到的天气信息
     """
 
-    def __init__(self, st_date, count=1, adcode=None) -> None:
+    def __init__(self, st_date, address, count=1) -> None:
         self.url = 'https://hz.hjhj-e.com/api/index/calendar/'
         self.st_date = st_date
-        self.adcode = adcode
+        self.adcode = None
+        self.get_adcode(address)
         self.count = count
         self.weathers = dict()
         self.check()
 
     def check(self):
         pattern = r'^\d{4}-(0[1-9]|1[0-2])$'
-        if not re.match(pattern, self.st_date) or self.adcode is None:
-            raise Exception("st_date or adcode value error,st_date type like YYYY-MM")
+        if not re.match(pattern, self.st_date):
+            raise Exception("st_date value error,st_date type like YYYY-MM")
         try:
             if self.count <= 0:
                 raise Exception("count value error")
@@ -52,6 +61,7 @@ class Weather:
             get_url = f'{self.url}{date}/{self.adcode}'
             req = requests.get(url=get_url)
             req.encoding = 'utf-8'
+            logging.info(self.adcode)
             data = json.loads(req.text)
             weathers_data = jsonpath.jsonpath(data, '$..data')
             self.date_with_weather(date, weathers_data[0])
@@ -67,44 +77,23 @@ class Weather:
                 }
         return None
 
+    def get_adcode(self, ad):
+        dic_code = Adcode().get()
+        ads = dic_code.keys()
+        choose = difflib.get_close_matches(ad, ads, 3, cutoff=0.6)
+        logging.info(choose)
+        if len(choose) == 0:
+            raise Exception('address not found')
+        if len(choose) > 1:
+            print('存在多个匹配值')
+            for i in range(len(choose)):
+                print('%5s' % (str(i) + '.') + str(choose[i]))
+            x = int(input("choose:"))
+            choose = choose[x]
+        else:
+            choose = choose[0]
+        logging.info(dic_code[choose])
+        self.adcode = dic_code[choose]
+        return None
 
-class Area_code:
-    """行政区划获取类
-    Attributes:
-        url -> (str): api地址
-        key -> (str): api认证
-        keywords ->(str): 地名关键词
-        subdistrict -> (str): 设置显示下级行政区级数,可选值：0、1、2、3
-        page -> (str): 需要第几页数据,最外层的districts最多会返回20个数据，若超过限制，请用page请求下一页数据。
-        output ->(str): 返回数据格式类型,可选值：JSON，XML
-    """
-
-    def __init__(self, keywords=''):
-        self.url = 'https://restapi.amap.com/v3/config/district?'
-        # key的每日配额为5000条
-        self.key = '157b68bc8bc8f2345294b4dfb97c5afc'
-        self.keywords = keywords
-        self.subdistrict = '3'
-        self.page = '1'
-        self.output = 'JSON'
-        self.check()
-
-    def check(self):
-        if self.keywords == '':
-            raise Exception('Error: keywords is None')
-
-    def get_code(self):
-        get_url = f'{self.url}key={self.key}&keywords={self.keywords}&subdistrict={self.subdistrict}' \
-                  f'&page={self.page}&output={self.output}'
-        req = requests.get(url=get_url)
-        req.encoding = 'utf-8'
-        data = json.loads(req.text)
-        adcode = jsonpath.jsonpath(data, '$..adcode')
-        address = jsonpath.jsonpath(data, '$..name')
-        level = jsonpath.jsonpath(data, '$..level')
-        res = []
-        for code, ad, lv in zip(adcode, address, level):
-            if lv != 'street':
-                res.append((code, ad, lv))
-        return res
 
