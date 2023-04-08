@@ -34,8 +34,8 @@
 >>
 >>>***date_with_weather(self, dt, wt)*** -> None  
 >>>*对取得的数据进行进一步处理，将日期与对应天气与降水相关联，赋值给 **self.weather** *
-> 
+>>
+>>>***get_adcode*** -> None  
+>>>*搜索adcode字典对 **self.adcode**  赋值，模糊检索匹配地区*
 
-> *Area_code* 类  
-> 参见 [*高德api*](https://lbs.amap.com/api/webservice/guide/api/district)  
-> api key限额为每日5000条
+> ~~*Area_code* 类~~
