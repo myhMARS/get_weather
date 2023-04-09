@@ -1,4 +1,4 @@
-from getweather import Area_code, Weather
+from getweather import  Weather
 import pprint
 
 
