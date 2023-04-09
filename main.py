@@ -1,4 +1,4 @@
-from getweather import  Weather
+from getweather import Weather
 import pprint
 
 
